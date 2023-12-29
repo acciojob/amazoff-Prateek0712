@@ -60,7 +60,7 @@ public class OrderRepo {
     /* <------------- Post Metthod ---------------> */
     public void addOrder(Order o)
     {
-        if(o.getId().length()!=0)
+        if(o.getId().length()!=0 && o.getDeliveryTime()!=0)
         {
             Omap.put(o.getId(),o);
             Uoset.add(o.getId());
@@ -116,7 +116,14 @@ public class OrderRepo {
     }
     public List<String> getAllOdByPartnerId(String  DpId)
     {
-        return new ArrayList<>(ODpmap.getOrDefault(DpId,null));
+        if(ODpmap.containsKey(DpId))
+        {
+            return new ArrayList<>(ODpmap.get(DpId));
+        }
+        else
+        {
+            return null;
+        }
     }
     public List<String> getAllOrder()
     {
@@ -153,13 +160,17 @@ public class OrderRepo {
     }
     public Integer getLastDelivered(String DpId)
     {
-        Integer maxi=Integer.MIN_VALUE;
-        List<String>OList=ODpmap.get(DpId);
-        for(String o:OList)
+        if(ODpmap.containsKey(DpId))
         {
-            maxi=Math.max(maxi,Omap.get(o).getDeliveryTime());
+            Integer maxi=Integer.MIN_VALUE;
+            List<String>OList=ODpmap.get(DpId);
+            for(String o:OList)
+            {
+                maxi=Math.max(maxi,Omap.get(o).getDeliveryTime());
+            }
+            return maxi;
         }
-        return maxi;
+        return  null;
     }
 
     /* <---------- DELETE METHOD -------------> */

@@ -7,7 +7,7 @@ import java.util.*;
 @Service
 public class OrderService {
     @Autowired
-    private OrderRepo Odrepo;
+    private OrderRepo Odrepo=new OrderRepo();
 
     /* <-----------Post Method-------------> */
     public void addOrder(Order o)
@@ -57,8 +57,17 @@ public class OrderService {
     public String getLastDelivered(String DpId)
     {
         Integer TimeStamp=Odrepo.getLastDelivered(DpId);
-        String time=TimeStamp/60+":"+TimeStamp%60;
-        return time;
+        if(TimeStamp==null)
+        {
+            return null;
+        }
+        int h = TimeStamp/60;
+        int m = TimeStamp- (h*60);
+
+        String hrs = String.format("%02d", h);
+        String mnts = String.format("%02d", m);
+
+        return (hrs + ":" + mnts);
     }
 
     /* <----------- DELETE METHOD ---------> */
