@@ -1,68 +1,77 @@
 package com.driver;
 
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
+
 @Service
 public class OrderService {
-    @Autowired
-    private OrderRepo Odrepo=new OrderRepo();
+    //    @Autowired
+    OrderRepo orderRepository = new OrderRepo();
 
-    /* <-----------Post Method-------------> */
-    public void addOrder(Order o)
-    {
-        Odrepo.addOrder(o);
-    }
-    public void addDp(DeliveryPartner dp)
-    {
-        Odrepo.addDp(dp);
+    public void addOrder(Order order){
+        orderRepository.addOrder(order);
     }
 
-    /* <----------- Put Method ------------> */
-    public void addDpandOdPair(String OId,String DpId)
-    {
-        Odrepo.addDpandOdPair(OId,DpId);
+    public void addPartner(String pId){
+        DeliveryPartner partner = new DeliveryPartner(pId);
+        orderRepository.addPartner(partner);
     }
 
-    /* <----------- Get Method ------------> */
-    public Order getOrderById(String OId)
-    {
-        return Odrepo.getOrderById(OId);
+    public void assignOrder(String pId, String oId){
+        orderRepository.assignOrder(pId, oId);
     }
-    public DeliveryPartner getPartnerById(String DpId)
-    {
-        return Odrepo.getPartnerById(DpId);
+
+    public Order getOrderById(String oId){
+        return orderRepository.getOrderById(oId);
     }
-    public Integer getOdCntByPartnerId(String  DpId)
-    {
-        return Odrepo.getOdCntByPartnerId(DpId);
+
+    public DeliveryPartner getPartnerById(String pId){
+        return orderRepository.getPartnerById(pId);
     }
-    public List<String> getAllOdByPartnerId(String DpId)
-    {
-        return Odrepo.getAllOdByPartnerId(DpId);
+
+    public int numOfOrdersAssignedToPartner(String pId){
+        return orderRepository.numOfOrdersAssignedToPartner(pId);
     }
-    public List<String> getAllOrder()
-    {
-        return Odrepo.getAllOrder();
+
+    public List<String> getListOfOrdersByPartner(String pId){
+        return orderRepository.getListOfOrdersByPartner(pId);
     }
-    public Integer getUnsignedOrder()
-    {
-        return Odrepo.getUnsignedOrer();
+
+    public List<String> getAllOrders(){
+        return orderRepository.getAllOrders();
     }
-    public Integer getLeftOnes(String Time,String DpId)
-    {
-        return Odrepo.getLeftOnes(Time,DpId);
+
+    public int getCountOfUnassignedOrders(){
+        return orderRepository.getCountOfUnassignedOrders();
     }
-    public String getLastDelivered(String DpId)
-    {
-        Integer TimeStamp=Odrepo.getLastDelivered(DpId);
-        if(TimeStamp==null)
-        {
+
+    public int getCountOfUndeliveredOrders(String pId, String time){
+        return orderRepository.undeliveredOrder(pId,time);
+    }
+
+    public String getLastDeliveryTime(String pId){
+        if(orderRepository.getListOfOrdersByPartner(pId) == null){
             return null;
         }
-        int h = TimeStamp/60;
-        int m = TimeStamp- (h*60);
+        // get order list of that partner
+        List<String> partnerOrders = orderRepository.getListOfOrdersByPartner(pId);
+
+        int lastDeliveryTime = Integer.MIN_VALUE;
+
+        for(String oId: partnerOrders){
+            // get order and then get delivery time of that order
+            Order order = orderRepository.getOrderById(oId);
+            int deliveryTime = order.getDeliveryTime();
+            if(deliveryTime > lastDeliveryTime){
+                lastDeliveryTime = deliveryTime;
+            }
+        }
+
+        // now convert this time from int to string
+        int h = lastDeliveryTime/60;
+        int m = lastDeliveryTime - (h*60);
 
         String hrs = String.format("%02d", h);
         String mnts = String.format("%02d", m);
@@ -70,26 +79,11 @@ public class OrderService {
         return (hrs + ":" + mnts);
     }
 
-    /* <----------- DELETE METHOD ---------> */
-
-    public void delPartnerById(String DpId)
-    {
-        Odrepo.delPartnerById(DpId);
-    }
-    public void delOrderById(String Oid)
-    {
-        Odrepo.getOrderById(Oid);
+    public void deletePartner(String pId){
+        orderRepository.deletePartner(pId);
     }
 
-
-
-
-
-
-
-
-
-
-
-
+    public void deleteOrder(String oId){
+        orderRepository.deleteOrder(oId);
+    }
 }
