@@ -109,11 +109,11 @@ public class OrderRepo {
     }
     public int undeliveredOrder(String pid,String Time)
     {
-        if(partnerVsOrders.containsKey(pid)==false || Time.length()==0)
+        if(getListOfOrdersByPartner(pid)==null || Time.length()==0)
         {
-            return 0;
+            return  0;
         }
-        List<String>OrderList=partnerVsOrders.get(pid);
+        List<String>OrderList=getListOfOrdersByPartner(pid);
         int hr=Integer.parseInt(Time.substring(0,2));
         int min=Integer.parseInt(Time.substring(3));
         int Stamp=hr*60+min;
