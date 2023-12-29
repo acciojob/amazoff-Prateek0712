@@ -107,26 +107,7 @@ public class OrderRepo {
 
         return ordersMap.size() - orderVsPartner.size();
     }
-    public int undeliveredOrder(String pid,String Time)
-    {
-        if(getListOfOrdersByPartner(pid)==null || Time.length()==0)
-        {
-            return  0;
-        }
-        List<String>OrderList=getListOfOrdersByPartner(pid);
-        int hr=Integer.parseInt(Time.substring(0,2));
-        int min=Integer.parseInt(Time.substring(3));
-        int Stamp=hr*60+min;
-        int Uorders=0;
-        for(String  o:OrderList)
-        {
-            if(ordersMap.get(0).getDeliveryTime()>Stamp)
-            {
-                Uorders++;
-            }
-        }
-        return Uorders;
-    }
+
     public void deletePartner(String pId){
         if(partnersMap.containsKey(pId)){
             // remove from partners map

@@ -48,8 +48,29 @@ public class OrderService {
     }
 
     public int getCountOfUndeliveredOrders(String pId, String time){
-        return orderRepository.undeliveredOrder(pId,time);
+        if(orderRepository.getListOfOrdersByPartner(pId) == null || time.length() == 0){
+            return 0;
+        }
+        // convert time from string to integer
+        String hrs = time.substring(0, 2);
+        String mnts = time.substring(3);
+        int maxTime = Integer.parseInt(hrs)*60 + Integer.parseInt(mnts);
+
+        // get list of all orders from partner id
+        List<String> partnerOrders = orderRepository.getListOfOrdersByPartner(pId);
+        int unDeliveredOrders = 0;
+
+        for(String oId: partnerOrders){
+            // get order by id then get delivery time of each order
+            Order order = orderRepository.getOrderById(oId);
+            if(order.getDeliveryTime() > maxTime){
+                unDeliveredOrders++;
+            }
+        }
+
+        return unDeliveredOrders;
     }
+
 
     public String getLastDeliveryTime(String pId){
         if(orderRepository.getListOfOrdersByPartner(pId) == null){
