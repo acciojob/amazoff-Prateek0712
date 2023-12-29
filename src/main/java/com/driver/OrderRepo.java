@@ -104,7 +104,15 @@ public class OrderRepo {
     }
     public Integer getOdCntByPartnerId(String DpId)
     {
-        return Dpmap.get(DpId).getNumberOfOrders();
+
+        if(Dpmap.containsKey(DpId))
+        {
+            return Dpmap.get(DpId).getNumberOfOrders();
+        }
+        else
+        {
+            return 0;
+        }
     }
     public List<String> getAllOdByPartnerId(String  DpId)
     {
