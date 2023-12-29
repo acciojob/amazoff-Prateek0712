@@ -5,11 +5,57 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 @Repository
 public class OrderRepo {
-    private HashMap<String,Order>Omap=new HashMap<>();
-    private HashMap<String,DeliveryPartner>Dpmap=new HashMap<>();
-    private HashMap<String,List<String>>ODpmap=new HashMap<>();
-    HashSet<String>Uoset=new HashSet<>();
-    HashMap<String, String>Somap=new HashMap<>();
+    private HashMap<String,Order>Omap;
+    private HashMap<String,DeliveryPartner>Dpmap;
+    private HashMap<String,List<String>>ODpmap;
+    HashSet<String>Uoset;
+    HashMap<String, String>Somap;
+    OrderRepo(){
+        this.Omap=new HashMap<>();
+        this.Dpmap=new HashMap<>();
+        this.ODpmap=new HashMap<>();
+        this.Uoset=new HashSet<>();
+        this.Somap=new HashMap<>();
+    }
+    public HashMap<String, Order> getOmap() {
+        return Omap;
+    }
+
+    public void setOmap(HashMap<String, Order> omap) {
+        Omap = omap;
+    }
+
+    public HashMap<String, DeliveryPartner> getDpmap() {
+        return Dpmap;
+    }
+
+    public void setDpmap(HashMap<String, DeliveryPartner> dpmap) {
+        Dpmap = dpmap;
+    }
+
+    public HashMap<String, List<String>> getODpmap() {
+        return ODpmap;
+    }
+
+    public void setODpmap(HashMap<String, List<String>> ODpmap) {
+        this.ODpmap = ODpmap;
+    }
+
+    public HashSet<String> getUoset() {
+        return Uoset;
+    }
+
+    public void setUoset(HashSet<String> uoset) {
+        Uoset = uoset;
+    }
+
+    public HashMap<String, String> getSomap() {
+        return Somap;
+    }
+
+    public void setSomap(HashMap<String, String> somap) {
+        Somap = somap;
+    }
 
     /* <------------- Post Metthod ---------------> */
     public void addOrder(Order o)
