@@ -67,19 +67,15 @@ public class OrderRepo {
     /* <------------- Put Method ---------------> */
     public void addDpandOdPair(String Oid,String DpId)
     {
-        if(Omap.containsKey(Oid) && Dpmap.containsKey(DpId))
+        if(!Omap.containsKey(Oid) || Dpmap.containsKey(DpId))
         {
-            List<String>OList=ODpmap.getOrDefault(DpId,new ArrayList<>());
-            OList.add(Oid);
-            ODpmap.put(DpId,OList);
-            Somap.put(Oid,DpId);
-            DeliveryPartner Dp=Dpmap.get(DpId);
-            Dp.setNumberOfOrders(Dp.getNumberOfOrders()+1);
-            Dpmap.put(DpId,Dp);
-        }
-        else {
             return ;
         }
+        List<String>OList=ODpmap.getOrDefault(DpId,new ArrayList<>());
+        OList.add(Oid);
+        ODpmap.put(DpId,OList);
+        Somap.put(Oid,DpId);
+        Dpmap.get(DpId).setNumberOfOrders(ODpmap.get(DpId).size());
     }
 
     /* <------------ Get Method ------------> */
@@ -91,7 +87,7 @@ public class OrderRepo {
     {
         return Dpmap.getOrDefault(DpId,null);
     }
-    public Integer getOdCntByPartnerId(String DpId)
+    public int getOdCntByPartnerId(String DpId)
     {
 
         if(Dpmap.containsKey(DpId))
@@ -109,19 +105,16 @@ public class OrderRepo {
         {
             return new ArrayList<>(ODpmap.get(DpId));
         }
-        else
-        {
-            return null;
-        }
+        return null;
     }
     public List<String> getAllOrder()
     {
-        List<String>OList=new ArrayList<>();
-        for(String key:Omap.keySet())
+        if(Omap.size()>0)
         {
-            OList.add(key);
+            List<String> orders = new ArrayList(Omap.keySet());
+            return orders;
         }
-        return  OList;
+        return null;
     }
     public Integer getUnsignedOrer()
     {
@@ -143,7 +136,7 @@ public class OrderRepo {
         {
             if(Omap.get(o).getDeliveryTime()>TimeStamp)
             {
-                ans+=1;
+                ans++;
             }
         }
         return ans;
@@ -179,33 +172,21 @@ public class OrderRepo {
             }
             ODpmap.remove(DpId);
         }
-        else
-        {
-            return ;
-        }
     }
     public void delOrderById(String OId)
     {
         Order o=Omap.get(OId);
         if(Omap.containsKey(OId))
         {
-            if(Somap.containsKey(OId))
-            {
-                String DpId=Somap.get(OId);
-                Somap.remove(OId);
-                List<String>oList=ODpmap.get(DpId);
-                oList.remove(OId);
-                if(oList.size()>0)
-                {
-                    ODpmap.put(DpId,oList);
-                    Dpmap.get(DpId).setNumberOfOrders(Dpmap.get(DpId).getNumberOfOrders()-1);
-                }
-            }
             Omap.remove(OId);
         }
-        else
+        if(Somap.containsKey(OId))
         {
-            return ;
+            String DpId=Somap.get(OId);
+            Somap.remove(OId);
+            List<String>oList=ODpmap.get(DpId);
+            oList.remove(OId);
+            Dpmap.get(DpId).setNumberOfOrders(ODpmap.get(DpId).size());
         }
     }
 
