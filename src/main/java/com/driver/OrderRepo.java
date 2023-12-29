@@ -8,13 +8,11 @@ public class OrderRepo {
     private HashMap<String,Order>Omap;
     private HashMap<String,DeliveryPartner>Dpmap;
     private HashMap<String,List<String>>ODpmap;
-    HashSet<String>Uoset;
     HashMap<String, String>Somap;
     OrderRepo(){
         this.Omap=new HashMap<>();
         this.Dpmap=new HashMap<>();
         this.ODpmap=new HashMap<>();
-        this.Uoset=new HashSet<>();
         this.Somap=new HashMap<>();
     }
     public HashMap<String, Order> getOmap() {
@@ -41,13 +39,6 @@ public class OrderRepo {
         this.ODpmap = ODpmap;
     }
 
-    public HashSet<String> getUoset() {
-        return Uoset;
-    }
-
-    public void setUoset(HashSet<String> uoset) {
-        Uoset = uoset;
-    }
 
     public HashMap<String, String> getSomap() {
         return Somap;
@@ -63,7 +54,6 @@ public class OrderRepo {
         if(o.getId().length()!=0 && o.getDeliveryTime()!=0)
         {
             Omap.put(o.getId(),o);
-            Uoset.add(o.getId());
         }
     }
     public void addDp(DeliveryPartner dp)
@@ -77,12 +67,11 @@ public class OrderRepo {
     /* <------------- Put Method ---------------> */
     public void addDpandOdPair(String Oid,String DpId)
     {
-        if(Omap.containsKey(Oid)&&Uoset.contains(Oid) && Dpmap.containsKey(DpId))
+        if(Omap.containsKey(Oid) && Dpmap.containsKey(DpId))
         {
             List<String>OList=ODpmap.getOrDefault(DpId,new ArrayList<>());
             OList.add(Oid);
             ODpmap.put(DpId,OList);
-            Uoset.remove(Oid);
             Somap.put(Oid,DpId);
             DeliveryPartner Dp=Dpmap.get(DpId);
             Dp.setNumberOfOrders(Dp.getNumberOfOrders()+1);
@@ -136,7 +125,8 @@ public class OrderRepo {
     }
     public Integer getUnsignedOrer()
     {
-        return Uoset.size();
+
+        return Omap.size()-Somap.size();
     }
     public Integer getLeftOnes(String Time,String DpId)
     {
@@ -176,16 +166,18 @@ public class OrderRepo {
     /* <---------- DELETE METHOD -------------> */
     public void delPartnerById(String DpId)
     {
+        if(Dpmap.containsKey(DpId))
+        {
+            Dpmap.remove(DpId);
+        }
         if(ODpmap.containsKey(DpId))
         {
             List<String>OList=ODpmap.get(DpId);
             for(String o:OList)
             {
                 Somap.remove(o);
-                Uoset.add(o);
             }
             ODpmap.remove(DpId);
-            Dpmap.remove(DpId);
         }
         else
         {
@@ -203,11 +195,11 @@ public class OrderRepo {
                 Somap.remove(OId);
                 List<String>oList=ODpmap.get(DpId);
                 oList.remove(OId);
-                ODpmap.put(DpId,oList);
-                Dpmap.get(DpId).setNumberOfOrders(Dpmap.get(DpId).getNumberOfOrders()-1);
-            }
-            else {
-                Uoset.remove(OId);
+                if(oList.size()>0)
+                {
+                    ODpmap.put(DpId,oList);
+                    Dpmap.get(DpId).setNumberOfOrders(Dpmap.get(DpId).getNumberOfOrders()-1);
+                }
             }
             Omap.remove(OId);
         }
