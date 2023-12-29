@@ -14,18 +14,24 @@ public class OrderRepo {
     /* <------------- Post Metthod ---------------> */
     public void addOrder(Order o)
     {
-        Omap.put(o.getId(),o);
-        Uoset.add(o.getId());
+        if(o.getId().length()!=0)
+        {
+            Omap.put(o.getId(),o);
+            Uoset.add(o.getId());
+        }
     }
     public void addDp(DeliveryPartner dp)
     {
-        Dpmap.put(dp.getId(),dp);
+        if(dp.getId().length()!=0)
+        {
+            Dpmap.put(dp.getId(),dp);
+        }
     }
 
     /* <------------- Put Method ---------------> */
     public void addDpandOdPair(String Oid,String DpId)
     {
-        if(Uoset.contains(Oid))
+        if(Omap.containsKey(Oid)&&Uoset.contains(Oid) && Dpmap.containsKey(DpId))
         {
             List<String>OList=ODpmap.getOrDefault(DpId,new ArrayList<>());
             OList.add(Oid);
@@ -35,6 +41,9 @@ public class OrderRepo {
             DeliveryPartner Dp=Dpmap.get(DpId);
             Dp.setNumberOfOrders(Dp.getNumberOfOrders()+1);
             Dpmap.put(DpId,Dp);
+        }
+        else {
+            return ;
         }
     }
 
@@ -70,19 +79,23 @@ public class OrderRepo {
     }
     public Integer getLeftOnes(String Time,String DpId)
     {
-        List<String>OList=ODpmap.get(DpId);
+        List<String>OList=ODpmap.getOrDefault(DpId,null);
+        if(Time.length()==0 || OList==null)
+        {
+            return 0;
+        }
         Integer ans=0;
         int hr=Integer.parseInt(Time.substring(0,2));
         int mm=Integer.parseInt(Time.substring(3));
         int TimeStamp=hr*60+mm;
         for(String o:OList)
         {
-            if(Omap.get(o).getDeliveryTime()==TimeStamp)
+            if(Omap.get(o).getDeliveryTime()>TimeStamp)
             {
                 ans+=1;
             }
         }
-        return ans-1;
+        return ans;
     }
     public Integer getLastDelivered(String DpId)
     {
@@ -98,30 +111,45 @@ public class OrderRepo {
     /* <---------- DELETE METHOD -------------> */
     public void delPartnerById(String DpId)
     {
-        List<String>OList=ODpmap.get(DpId);
-        for(String o:OList)
+        if(ODpmap.containsKey(DpId))
         {
-            Somap.remove(o);
-            Uoset.add(o);
+            List<String>OList=ODpmap.get(DpId);
+            for(String o:OList)
+            {
+                Somap.remove(o);
+                Uoset.add(o);
+            }
+            ODpmap.remove(DpId);
+            Dpmap.remove(DpId);
         }
-        ODpmap.remove(DpId);
-        Dpmap.remove(DpId);
+        else
+        {
+            return ;
+        }
     }
     public void delOrderById(String OId)
     {
         Order o=Omap.get(OId);
-        if(Somap.containsKey(OId))
+        if(Omap.containsKey(OId))
         {
-            String DpId=Somap.get(OId);
-            Somap.remove(OId);
-            List<String>oList=ODpmap.get(DpId);
-            oList.remove(OId);
-            ODpmap.put(DpId,oList);
+            if(Somap.containsKey(OId))
+            {
+                String DpId=Somap.get(OId);
+                Somap.remove(OId);
+                List<String>oList=ODpmap.get(DpId);
+                oList.remove(OId);
+                ODpmap.put(DpId,oList);
+                Dpmap.get(DpId).setNumberOfOrders(Dpmap.get(DpId).getNumberOfOrders()-1);
+            }
+            else {
+                Uoset.remove(OId);
+            }
+            Omap.remove(OId);
         }
-        else {
-            Uoset.remove(OId);
+        else
+        {
+            return ;
         }
-        Omap.remove(OId);
     }
 
 
